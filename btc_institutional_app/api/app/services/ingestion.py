@@ -36,7 +36,15 @@ def analysis_input_from_snapshot(
 ) -> AnalysisInput:
     price = float(snapshot.get("price") or 0.0)
     if price <= 0:
-        raise ValueError("invalid_snapshot_price")
+        fallback_prices = [
+            float(snapshot.get("open") or 0.0),
+            float(snapshot.get("high") or 0.0),
+            float(snapshot.get("low") or 0.0),
+        ]
+        price = max(fallback_prices)
+        if price <= 0:
+            price = 1.0
+        degraded = True
 
     high = float(snapshot.get("high") or price * 1.005)
     low = float(snapshot.get("low") or price * 0.995)

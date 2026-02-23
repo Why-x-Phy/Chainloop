@@ -675,6 +675,25 @@ def fetch_market_snapshot(symbol: str = "BTCUSDT") -> ProviderResult:
     try:
         return fetch_binance_snapshot(symbol=symbol)
     except (URLError, HTTPError, TimeoutError, ValueError):
-        fallback = fetch_coinbase_snapshot()
-        fallback.notes.append("primary_provider_failed")
-        return fallback
+        try:
+            fallback = fetch_coinbase_snapshot()
+            fallback.notes.append("primary_provider_failed")
+            return fallback
+        except Exception:
+            return ProviderResult(
+                source="market_synthetic_fallback",
+                payload={
+                    "symbol": symbol,
+                    "price": 0.0,
+                    "open": 0.0,
+                    "high": 0.0,
+                    "low": 0.0,
+                    "volume": 0.0,
+                    "quote_volume": 0.0,
+                    "bid_liquidity_10": 0.0,
+                    "ask_liquidity_10": 0.0,
+                    "timestamp_ms": int(time.time() * 1000),
+                },
+                degraded=True,
+                notes=["primary_provider_failed", "secondary_provider_failed"],
+            )

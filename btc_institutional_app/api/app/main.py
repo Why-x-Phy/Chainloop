@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from contextlib import asynccontextmanager
 from dataclasses import asdict
 import json
 import time
@@ -59,7 +60,13 @@ from app.services.providers import (
 )
 from app.services.settings import SETTINGS
 
-app = FastAPI(title="BTC Institutional Analysis API", version="0.7.0")
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    init_db()
+    yield
+
+
+app = FastAPI(title="BTC Institutional Analysis API", version="0.7.0", lifespan=lifespan)
 client = build_exchange_client()
 
 
@@ -84,10 +91,6 @@ async def request_logger(request: Request, call_next):
     print(json.dumps(log_payload, ensure_ascii=False))
     return response
 
-
-@app.on_event("startup")
-def startup() -> None:
-    init_db()
 
 
 @app.get("/v1/health")

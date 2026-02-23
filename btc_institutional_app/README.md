@@ -73,6 +73,20 @@ Private VPS-ready architecture for a BTC institutional analysis platform with ex
 - If these are not configured/reachable, ingestion is marked degraded with explicit event-calendar notes.
 - `API_WRITE_TOKEN` (or `API_WRITE_TOKEN_FILE`) optionally protects mutating API routes (`POST` actions) via `X-Write-Token` header.
 
+## Local developer bootstrap (works without Docker CLI)
+
+If Docker is unavailable in your current environment, you can still develop and test locally:
+
+```bash
+cd btc_institutional_app
+make doctor
+make bootstrap
+make test
+make run-api
+```
+
+See `docs/local_bootstrap.md` for full Docker + non-Docker setup paths.
+
 ## Quick start
 
 ```bash
